@@ -4,7 +4,25 @@
         If (Current.Length = 0 Or Current = "0") Then
             SetField(Digit)
         Else
-            TextIO.Text = Current + Str(Digit)
+            TextIO.Text = Current & Trim(Str(Digit))
+        End If
+    End Sub
+    Public Sub PopDigit()
+        Dim Current As String = TextIO.Text
+        If (Current.Length < 2 Or Current = "0") Then
+            ClearField()
+        Else
+            TextIO.Text = Current.Substring(0, Current.Length - 1)
+        End If
+    End Sub
+    Public Sub AppendPeriod()
+        Dim Current As String = TextIO.Text
+        If (Not Current.Contains(Period)) Then
+            If (Current.Length = 0) Then
+                TextIO.Text = "0" & Period
+            Else
+                TextIO.Text = Current & Period
+            End If
         End If
     End Sub
     Public Sub SetField(Value As Double)
@@ -28,65 +46,69 @@
     Public Function OperationDivide(First As Double, Second As Double) As Double
         OperationDivide = First / Second
     End Function
+    Public Function OperationPower(First As Double, Second As Double) As Double
+        OperationPower = First ^ Second
+    End Function
     Public Function GetOperationSign(Oper As EOperation) As String
-        Select Case Oper
-            Case Is = EOperation.Add
-                Return "+"
-            Case Is = EOperation.Subtract
-                Return "-"
-            Case Is = EOperation.Multiply
-                Return "*"
-            Case Is = EOperation.Divide
-                Return "/"
-            Case Else
-                Return "something went wrong"
-        End Select
+        Return Signs(Oper)
     End Function
     Public Enum EOperation
-        Add
+        Add = 0
         Subtract
         Multiply
         Divide
+        Power
     End Enum
     Public Operation As EOperation
+    Public Signs = New String() {"+", "-", "*", "/", "^"}
     Public FirstOperand As Double
     Public SecondOperand As Double
     Public IsCalculating As Boolean = False
     Public Const PI As Double = Math.PI
+    Public Const Period As String = "."
     Public Sub SetFirstOperand(Oper As EOperation)
-        SecondOperandLabel.Text = "0"
         If (Not IsCalculating) Then
             IsCalculating = True
             FirstOperand = GetField()
             FirstOperandLabel.Text = FirstOperand
             Operation = Oper
             OperationLabel.Text = GetOperationSign(Operation)
+            ClearField()
         End If
     End Sub
     Public Sub SetSecondOperand()
         If (IsCalculating) Then
             SecondOperand = GetField()
-            SecondOperandLabel.Text = SecondOperand
         End If
     End Sub
     Public Sub EndCalculation(EndValue As Double)
         If (IsCalculating) Then
-            FirstOperand = EndValue
-            SecondOperand = EndValue
+            ClearStore()
             IsCalculating = False
         End If
     End Sub
+    Public Sub ClearStore()
+        FirstOperand = 0
+        FirstOperandLabel.Text = FirstOperand
+        SecondOperand = 0
+        Operation = EOperation.Add
+        OperationLabel.Text = ""
+        IsCalculating = False
+    End Sub
     Public Sub SetAnswer()
         If (IsCalculating) Then
-            If (Operation = EOperation.Add) Then
-                SetField(OperationAdd(FirstOperand, SecondOperand))
-            ElseIf (Operation = EOperation.Subtract) Then
-                SetField(OperationSubtract(FirstOperand, SecondOperand))
-            ElseIf (Operation = EOperation.Multiply) Then
-                SetField(OperationMultiply(FirstOperand, SecondOperand))
-            ElseIf (Operation = EOperation.Divide) Then
-                SetField(OperationDivide(FirstOperand, SecondOperand))
-            End If
+            Select Case Operation
+                Case EOperation.Add
+                    SetField(OperationAdd(FirstOperand, SecondOperand))
+                Case EOperation.Subtract
+                    SetField(OperationSubtract(FirstOperand, SecondOperand))
+                Case EOperation.Multiply
+                    SetField(OperationMultiply(FirstOperand, SecondOperand))
+                Case EOperation.Divide
+                    SetField(OperationDivide(FirstOperand, SecondOperand))
+                Case EOperation.Power
+                    SetField(OperationPower(FirstOperand, SecondOperand))
+            End Select
         End If
     End Sub
     Private Sub ButtonAdd_Click(sender As Object, e As EventArgs) Handles ButtonAdd.Click
@@ -149,5 +171,26 @@
 
     Private Sub ButtonDigit9_Click(sender As Object, e As EventArgs) Handles ButtonDigit9.Click
         AppendDigit(9)
+    End Sub
+
+    Private Sub ButtonBackspace_Click(sender As Object, e As EventArgs) Handles ButtonBackspace.Click
+        PopDigit()
+    End Sub
+
+    Private Sub ButtonC_Click(sender As Object, e As EventArgs) Handles ButtonC.Click
+        ClearField()
+    End Sub
+
+    Private Sub ButtonCE_Click(sender As Object, e As EventArgs) Handles ButtonCE.Click
+        ClearField()
+        ClearStore()
+    End Sub
+
+    Private Sub ButtonPeriod_Click(sender As Object, e As EventArgs) Handles ButtonPeriod.Click
+        AppendPeriod()
+    End Sub
+
+    Private Sub ButtonPower_Click(sender As Object, e As EventArgs) Handles ButtonPower.Click
+        SetFirstOperand(EOperation.Power)
     End Sub
 End Class
