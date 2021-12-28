@@ -55,6 +55,7 @@ Partial Class Calculator
         Me.TextIO.Size = New System.Drawing.Size(234, 20)
         Me.TextIO.TabIndex = 0
         Me.TextIO.Text = "0"
+        Me.TextIO.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'ButtonAdd
         '

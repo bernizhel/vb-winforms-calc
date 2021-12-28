@@ -74,6 +74,14 @@
             Operation = Oper
             OperationLabel.Text = GetOperationSign(Operation)
             ClearField()
+        Else
+            SetSecondOperand()
+            SetAnswer()
+            Operation = Oper
+            OperationLabel.Text = GetOperationSign(Operation)
+            FirstOperand = GetField()
+            FirstOperandLabel.Text = FirstOperand
+            ClearField()
         End If
     End Sub
     Public Sub SetSecondOperand()
